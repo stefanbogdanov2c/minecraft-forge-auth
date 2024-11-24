@@ -49,4 +49,14 @@ public class AuthEvents {
             }
         }
     }
+
+    // Called when a player logs out (disconnects)
+    @SubscribeEvent
+    public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
+        ServerPlayer player = (ServerPlayer) event.getEntity();
+        String playerName = player.getName().getString();
+
+        // Log the player out by removing them from the logged-in list
+        PlayerAuthHandler.logout(playerName);
+    }
 }
