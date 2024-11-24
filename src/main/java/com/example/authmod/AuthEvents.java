@@ -25,6 +25,12 @@ public class AuthEvents {
             player.displayClientMessage(Component.literal("Please log in using /auth login <password>"), false);
             playerPositions.put(playerId, player.position());
         }
+
+            if (!PlayerAuthHandler.isLoggedIn(player.getName().getString())) {
+              // If the player is not logged in, show a message and freeze their position
+              player.displayClientMessage(Component.literal("Please log in using /auth login <password>"), false);
+              playerPositions.put(playerId, player.position());
+            }
     }
 
     @SubscribeEvent
