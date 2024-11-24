@@ -1,44 +1,49 @@
 package com.example.forgeauth;
 
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.player.PlayerLoggedInEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @Mod.EventBusSubscriber
 public class AuthEvents {
-    private final Timer timer = new Timer();
+
+    private static final Map<UUID, Vec3> playerPositions = new HashMap<>();
 
     @SubscribeEvent
-    public void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
-        ServerPlayer player = (ServerPlayer) event.getEntity(); // Changed to `getEntity()`
-        if (!PlayerAuthHandler.isRegistered(player.getName().getString())) {
-            player.displayClientMessage(Component.literal("Please register using /auth register <password>"), false);
-        } else {
-            player.displayClientMessage(Component.literal("Please log in using /auth login <password>"), false);
-        }
+    public static void onPlayerJoin(PlayerLoggedInEvent event) {
+        ServerPlayer player = (ServerPlayer) event.getEntity();
+        UUID playerId = player.getUUID();
 
-        // Kick player if they don't log in within a minute
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (!PlayerAuthHandler.isLoggedIn(player.getName().getString())) {
-                    player.connection.disconnect(Component.literal("You failed to log in.")); // Corrected
-                }
-            }
-        }, 60000); // 1 minute
+        if (!PlayerAuthHandler.isLoggedIn(player.getName().getString())) {
+            player.displayClientMessage(Component.literal("Please log in using /auth login <password>"), false);
+            playerPositions.put(playerId, player.position());
+        }
     }
 
     @SubscribeEvent
-    public void onPlayerInteract(PlayerInteractEvent event) { // Corrected to `PlayerInteractEvent`
-        ServerPlayer player = (ServerPlayer) event.getEntity(); // Changed to `getEntity()`
-        if (!PlayerAuthHandler.isLoggedIn(player.getName().getString())) {
-            event.setCanceled(true);
+    public static void onPlayerTick(LivingEvent.LivingTickEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            UUID playerId = player.getUUID();
+            String playerName = player.getName().getString();
+
+            if (!PlayerAuthHandler.isLoggedIn(playerName)) {
+                // Freeze the player
+                Vec3 originalPos = playerPositions.get(playerId);
+                if (originalPos != null) {
+                    player.teleportTo(originalPos.x, originalPos.y, originalPos.z);
+                    player.setDeltaMovement(Vec3.ZERO); // Prevent movement
+                }
+            } else {
+                // Remove from frozen list if logged in
+                playerPositions.remove(playerId);
+            }
         }
     }
 }
