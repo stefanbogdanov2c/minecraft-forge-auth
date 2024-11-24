@@ -15,7 +15,7 @@ public class AuthCommand {
                         String username = context.getSource().getTextName();
                         String password = StringArgumentType.getString(context, "password");
                         if (PlayerAuthHandler.register(username, password)) {
-                            context.getSource().sendSuccess(Component.literal("Registered successfully!"), false);
+                            context.getSource().sendSuccess(() -> Component.literal("Registered successfully!"), false);
                         } else {
                             context.getSource().sendFailure(Component.literal("You are already registered!"));
                         }
@@ -29,7 +29,7 @@ public class AuthCommand {
                         String username = context.getSource().getTextName();
                         String password = StringArgumentType.getString(context, "password");
                         if (PlayerAuthHandler.login(username, password)) {
-                            context.getSource().sendSuccess(Component.literal("Logged in successfully!"), false);
+                            context.getSource().sendSuccess(() -> Component.literal("Logged in successfully!"), false);
                         } else {
                             context.getSource().sendFailure(Component.literal("Invalid username or password!"));
                         }
