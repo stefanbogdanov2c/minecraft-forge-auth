@@ -36,6 +36,19 @@ public class AuthCommand {
                         return 1;
                     })
                 )
+            ).then(Commands.literal("changePassword")
+                .then(Commands.argument("password", StringArgumentType.string())
+                    .executes(context -> {
+                        String username = context.getSource().getTextName();
+                        String password = StringArgumentType.getString(context, "password");
+                        if (PlayerAuthHandler.changePassword(username, password)) {
+                            context.getSource().sendSuccess(() -> Component.literal("Password changed successfully!"), false);
+                        } else {
+                            context.getSource().sendFailure(Component.literal("Could not change password!"));
+                        }
+                        return 1;
+                    })
+                )
             );
     }
 }

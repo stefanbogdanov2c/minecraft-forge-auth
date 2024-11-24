@@ -34,4 +34,12 @@ public class PlayerAuthHandler {
     public static void logout(String username) {
         loggedInPlayers.remove(username);
     }
+
+    public static boolean changePassword(String username, String newPassword) {
+        if (isRegistered(username)) {
+            registeredPlayers.put(username, newPassword);
+            return true;
+        }
+        return false;
+    }
 }
