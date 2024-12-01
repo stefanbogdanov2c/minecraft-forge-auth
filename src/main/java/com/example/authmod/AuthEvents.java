@@ -1,5 +1,9 @@
 package com.example.forgeauth;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
@@ -7,10 +11,6 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 @Mod.EventBusSubscriber
 public class AuthEvents {
@@ -25,7 +25,7 @@ public class AuthEvents {
         // Check if the player is logged in
         if (!PlayerAuthHandler.isLoggedIn(player.getName().getString())) {
             // If the player is not logged in, show a message and freeze their position
-            player.displayClientMessage(Component.literal("Please log in using /auth login <password>"), false);
+            player.displayClientMessage(Component.literal("Please log in using /login <password>"), false);
             playerPositions.put(playerId, player.position());
         }
     }
