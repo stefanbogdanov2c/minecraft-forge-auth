@@ -7,6 +7,11 @@ public class PlayerAuthHandler {
     private static final Map<String, String> registeredPlayers = new HashMap<>();
     private static final Map<String, Boolean> loggedInPlayers = new HashMap<>();
 
+    static {
+        Map<String, String> data = AuthStorage.load();
+        registeredPlayers.putAll(data);
+    }
+
     public static boolean isRegistered(String username) {
         return registeredPlayers.containsKey(username);
     }
@@ -16,6 +21,7 @@ public class PlayerAuthHandler {
             return false; // Player is already registered
         }
         registeredPlayers.put(username, password);
+        saveData();
         return true;
     }
 
@@ -38,8 +44,13 @@ public class PlayerAuthHandler {
     public static boolean changePassword(String username, String newPassword) {
         if (isRegistered(username)) {
             registeredPlayers.put(username, newPassword);
+            saveData();
             return true;
         }
         return false;
+    }
+
+    private static void saveData() {
+        AuthStorage.save(registeredPlayers);
     }
 }

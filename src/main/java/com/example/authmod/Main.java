@@ -15,7 +15,17 @@ public class Main {
     }
 
     private void onServerStart(ServerStartingEvent event) {
-        // Register the /register and /login commands
-        event.getServer().getCommands().getDispatcher().register(AuthCommand.registerCommands());
+        // Load data from auth.json
+        Map<String, String> loadedData = AuthStorage.load();
+        loadedData.forEach(PlayerAuthHandler::register);
+
+        // Register the commands
+        event.getServer().getCommands().getDispatcher()
+            .register(AuthCommand.registerCommand());
+        event.getServer().getCommands().getDispatcher()
+            .register(AuthCommand.loginCommand());
+        event.getServer().getCommands().getDispatcher()
+            .register(AuthCommand.changePasswordCommand());
     }
+
 }
